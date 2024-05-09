@@ -33,11 +33,11 @@ public:
 
     void calculateBounds();
 
-    bool canMoveLeft();
+    bool canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     void moveLeft();
 
-    bool canMoveRight();
+    bool canMoveRight(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     void moveRight();
 
@@ -45,9 +45,11 @@ public:
 
     void moveDown();
 
-    void rotateCube(sf::Vector2f& offset);
+    bool canMove(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets={});
 
-    void rotate();
+    std::vector<sf::Vector2f> calculateRotatedCubeOffsets();
+
+    void rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     void place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 

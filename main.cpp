@@ -216,14 +216,14 @@ int main()
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 100) {
-            current_shape.rotate();
+            current_shape.rotate(placed_shapes);
             clock_rotate.restart();
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && clock_x.getElapsedTime().asMilliseconds() >= 75) {
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && clock_x.getElapsedTime().asMilliseconds() >= 75 && current_shape.canMoveLeft(placed_shapes)) {
             current_shape.moveLeft();
             clock_x.restart();
-        } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && clock_x.getElapsedTime().asMilliseconds() >= 75) {
+        } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && clock_x.getElapsedTime().asMilliseconds() >= 75 && current_shape.canMoveRight(placed_shapes)) {
             current_shape.moveRight();
             clock_x.restart();
         }

@@ -51,75 +51,92 @@ void TetrisShape::calculateBounds() {
     m_max_bounds = max_bounds;
 }
 
-bool TetrisShape::canMoveLeft() {
-    return m_grid_coord.x + m_min_bounds.x > 0;
+bool TetrisShape::canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+    return canMove(placed_shapes, -1, 0);
 }
 
 void TetrisShape::moveLeft() {
-    if(!canMoveLeft())
-        return;
-
     m_grid_coord.x -= 1;
 }
 
-bool TetrisShape::canMoveRight() {
-    return m_grid_coord.x + m_max_bounds.x < 10 - 1; //TODO 10=grid_cols, change this
+bool TetrisShape::canMoveRight(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+    return canMove(placed_shapes, 1, 0);
 }
 
 void TetrisShape::moveRight() {
-    if(!canMoveRight())
-        return;
-
     m_grid_coord.x += 1;
 }
 
 bool TetrisShape::canMoveDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
-    if(m_grid_coord.y + m_max_bounds.y >= 20 - 1) //FIXME 20=grid_rows, change this
-        return false;
+    return canMove(placed_shapes, 0, 1);
+}
+
+void TetrisShape::moveDown() {
+    m_grid_coord.y += 1;
+}
+
+bool TetrisShape::canMove(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets) {
+    if(offsets.size() == 0)
+        offsets = m_offsets;
     
-    for(const auto& offset: m_offsets) {
-        int row = m_grid_coord.y + offset.y + 1;
-        int col = m_grid_coord.x + offset.x;
+    for(const auto& offset: offsets) {
+        int row = m_grid_coord.y + offset.y + y_dir;
+        int col = m_grid_coord.x + offset.x + x_dir;
+
+        // Out of bounds
+        if(row < 0 || col < 0 || row >= placed_shapes.size() || col >= placed_shapes[0].size())
+            return false;
 
         //FIXME Find a better way to check if a placed_shape exists for the given row and col
         //Since all of our placed shapes are 40x40...
         sf::Vector2f cur_size = placed_shapes[row][col].getSize();
-        if(cur_size.x != 0 && cur_size.y != 0)
+        if(cur_size.x == 40 && cur_size.y == 40)
             return false;
     }
 
     return true;
 }
 
-void TetrisShape::moveDown() {
-    // if(!canMoveDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes))
-        // return;
-
-    m_grid_coord.y += 1;
-}
-
-void TetrisShape::rotateCube(sf::Vector2f& offset) {
-    double x = offset.x * std::cos(M_PI / 2) - offset.y * std::sin(M_PI / 2);
-    double y = offset.x * std::sin(M_PI / 2) + offset.y * std::cos(M_PI / 2);
-
-    std::cout << "Before: " << offset.x << ", after: " << x << "\n";
-    offset.x = x;
-    offset.y = y;
-}
-
 //Use rotation matrix to turn the shapes
 //Since our y-axis is flipped when compared to normal graphs (-y goes up and y goes down)
 //If we want to rotate clockwise we what normally would be a counter clockwise rotation
 //So if we want to rotate 90 deg clockwise, we have to calculate it like we want to rotate 90 deg counter clockwise
-void TetrisShape::rotate() {
+std::vector<sf::Vector2f> TetrisShape::calculateRotatedCubeOffsets() {
+    std::vector<sf::Vector2f> offsets;
+
+    for(sf::Vector2f& offset: m_offsets) {
+        double x = offset.x * std::cos(M_PI / 2) - offset.y * std::sin(M_PI / 2);
+        double y = offset.x * std::sin(M_PI / 2) + offset.y * std::cos(M_PI / 2);
+        offsets.push_back(sf::Vector2f(x, y));
+    }
+
+    return offsets;
+}
+
+void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
     if(!m_can_rotate)
         return;
 
-    for(sf::Vector2f& offset: m_offsets) {
-        rotateCube(offset);
+    std::vector<sf::Vector2f> offsets = calculateRotatedCubeOffsets();
+
+    std::vector<std::pair<int, int>> move_directions({{0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}});
+
+    //If the shape cannot be rotated without going out of bounds or colliding with another shape,
+    //It tries to move once to the right, once to the left, twice to the right and twice to the left.
+    //If any of these moves are possible without going out of bounds or colloding, the shape will be rotated.
+    //Otherwise, the shape wont be rotated
+    for(const std::pair<int, int>& dirs: move_directions) {
+        if(canMove(placed_shapes, dirs.first, dirs.second, offsets)) {
+            m_offsets = offsets;
+            m_grid_coord.x += dirs.first;
+            m_grid_coord.y += dirs.second;
+            return;
+        }
     }
 
-    calculateBounds();
+    std::cout << "Could not rotate :(((" << "\n";
+
+    // calculateBounds();
 }
 
 void TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
@@ -129,6 +146,7 @@ void TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_sha
 
         placed_shapes[row][col] = m_cubes[i];
     }
+    std::cout << m_grid_coord.y << "\n";
 }
 
 TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
@@ -137,14 +155,14 @@ TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
 
     bool can_rotate = true;
 
+    //TODO dont want the square/O to be able to rotate. Is there a cleaner way to do this?
     if(i == 3)
         can_rotate = false;
 
     return TetrisShape(grid_coord, TetrisShape::shapes[i].first, TetrisShape::shapes[i].second, can_rotate);
-    // return TetrisShape(grid_coord, {sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(0, -1)});
-    // return TetrisShape(grid_coord, {sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(2, 0), sf::Vector2f(3, 0)});
 }
 
+//TODO this feels dirty
 const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> TetrisShape::shapes = {
     std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-2, 0), sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0)}), sf::Color::Cyan), // I
     std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(-1, -1)}), sf::Color::Blue), // L
