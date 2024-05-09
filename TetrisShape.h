@@ -51,7 +51,7 @@ public:
 
     void rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
-    void place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    sf::Vector2f place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     static TetrisShape generateRandomShape(sf::Vector2f grid_coord = {0, 1});
 };

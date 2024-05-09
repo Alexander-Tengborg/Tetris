@@ -181,6 +181,54 @@ void drawGrid(sf::RenderWindow& window) {
     }
 }
 
+void moveRowsDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, std::vector<int> cleared_rows) {
+    for(int i = 0; i < cleared_rows.size(); i++) {
+        cleared_rows[i] += i;
+        for(int row = cleared_rows[i]; row > 0; row--) {
+            std::cout << "MOVING ROW " << row << "\n";
+            placed_shapes[row] = placed_shapes[row-1];
+            for(sf::RectangleShape& shape: placed_shapes[row]) {
+                sf::Vector2f cur_pos = shape.getPosition();
+                cur_pos.y += 40;
+
+                shape.setPosition(cur_pos);
+            }
+        }
+    }
+}
+
+int clearRows(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, sf::Vector2f row_span) {
+    int amount_cleared_rows = 0;
+    
+    std::vector<int> cleared_rows;
+
+    for(int row = row_span.y; row >= row_span.x; row--) {
+        bool skip_clear = false;
+        for(const sf::RectangleShape& shape: placed_shapes[row]) {
+            sf::Vector2f cur_size = shape.getSize();
+
+            if(cur_size.x != 40 && cur_size.y != 40)
+                skip_clear = true;
+        }
+
+        //If the row wasnt cleared, continue
+        if(skip_clear)
+            continue;
+
+        //Row was cleared, so clear the current row
+        for(int col = 0; col < placed_shapes[row].size(); col++) {
+            placed_shapes[row][col] = sf::RectangleShape();
+        }
+        amount_cleared_rows++;
+        cleared_rows.push_back(row);
+    }
+
+    if(amount_cleared_rows)
+        moveRowsDown(placed_shapes, cleared_rows);
+
+    return amount_cleared_rows;
+}
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(900, 800), "Tetris");
@@ -215,7 +263,7 @@ int main()
                 window.close();
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 100) {
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 200) {
             current_shape.rotate(placed_shapes);
             clock_rotate.restart();
         }
@@ -239,8 +287,9 @@ int main()
             if(current_shape.canMoveDown(placed_shapes))
                 current_shape.moveDown();
             else {
-                current_shape.place(placed_shapes);
+                sf::Vector2f highest_row = current_shape.place(placed_shapes);
                 current_shape = TetrisShape::generateRandomShape(start_coordinate);
+                clearRows(placed_shapes, highest_row);
             }
 
             clock_y.restart();

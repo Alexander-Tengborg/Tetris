@@ -119,10 +119,10 @@ void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_sh
 
     std::vector<sf::Vector2f> offsets = calculateRotatedCubeOffsets();
 
-    std::vector<std::pair<int, int>> move_directions({{0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}});
+    std::vector<std::pair<int, int>> move_directions({{0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}, {0, 1}});
 
     //If the shape cannot be rotated without going out of bounds or colliding with another shape,
-    //It tries to move once to the right, once to the left, twice to the right and twice to the left.
+    //It tries to move once to the right, once to the left, twice to the right and twice to the left (AND ONCE DOWN).
     //If any of these moves are possible without going out of bounds or colloding, the shape will be rotated.
     //Otherwise, the shape wont be rotated
     for(const std::pair<int, int>& dirs: move_directions) {
@@ -139,14 +139,24 @@ void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_sh
     // calculateBounds();
 }
 
-void TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+//Returns the highest and lowest rows of the placed shaped so we then have to check as few rows as possible
+sf::Vector2f TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+    sf::Vector2f row_span(INT_MAX, INT_MIN);
+
     for(int i = 0; i < m_cubes.size(); i++) {
         int row = m_grid_coord.y + m_offsets[i].y;
         int col = m_grid_coord.x + m_offsets[i].x;
 
+        std::cout << "row: " << row_span.x << " " << row << "\n";
+
+        //FIXME row_span.x/y are floats, row is int. Convert them to the same type in a better way
+        row_span.x = std::min(row_span.x, (float)row);
+        row_span.y = std::max(row_span.y, (float)row);
+
         placed_shapes[row][col] = m_cubes[i];
     }
-    std::cout << m_grid_coord.y << "\n";
+
+    return row_span;
 }
 
 TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
