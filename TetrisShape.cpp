@@ -59,7 +59,7 @@ void TetrisShape::moveLeft() {
 }
 
 bool TetrisShape::canMoveRight() {
-    return m_grid_coord.x + m_max_bounds.x < 10 - 1; //10=grid_cols, change this
+    return m_grid_coord.x + m_max_bounds.x < 10 - 1; //TODO 10=grid_cols, change this
 }
 
 void TetrisShape::moveRight() {
@@ -70,7 +70,7 @@ void TetrisShape::moveRight() {
 }
 
 bool TetrisShape::canMoveDown() {
-    return m_grid_coord.y + m_max_bounds.y < 20 - 1; //20=grid_rows, change this
+    return m_grid_coord.y + m_max_bounds.y < 20 - 1; //FIXME 20=grid_rows, change this
 }
 
 void TetrisShape::moveDown() {
@@ -99,6 +99,15 @@ void TetrisShape::rotate() {
     }
 
     calculateBounds();
+}
+
+void TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+    for(int i = 0; i < m_cubes.size(); i++) {
+        int row = m_grid_coord.y + m_offsets[i].y;
+        int col = m_grid_coord.x + m_offsets[i].x;
+
+        placed_shapes[row][col] = m_cubes[i];
+    }
 }
 
 TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {

@@ -188,7 +188,7 @@ int main()
     sf::RectangleShape game_area(sf::Vector2f(400, 800));
     game_area.setFillColor(sf::Color::Black);
     game_area.setOutlineColor(sf::Color::White);
-    game_area.setOutlineThickness(5);
+    game_area.setOutlineThickness(3);
     game_area.setPosition(sf::Vector2f(250, 0));
 
 
@@ -197,10 +197,14 @@ int main()
 
     TetrisShape current_shape = TetrisShape::generateRandomShape(start_coordinate);
 
+    std::vector<std::vector<sf::RectangleShape>> placed_shapes(grid_rows, std::vector<sf::RectangleShape>(grid_cols));
+
     sf::Clock clock_y;
     sf::Clock clock_x;
 
     sf::Clock clock_rotate;
+
+    int speed_up = 1;
 
     while(window.isOpen())
     {
@@ -211,6 +215,11 @@ int main()
                 window.close();
         }
 
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 100) {
+            current_shape.rotate();
+            clock_rotate.restart();
+        }
+
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && clock_x.getElapsedTime().asMilliseconds() >= 75) {
             current_shape.moveLeft();
             clock_x.restart();
@@ -219,13 +228,20 @@ int main()
             clock_x.restart();
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 100) {
-            current_shape.rotate();
-            clock_rotate.restart();
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+            speed_up = 20;
+        } else {
+            speed_up = 1;
         }
 
-        if(clock_y.getElapsedTime().asSeconds() >= 1) {
-            current_shape.moveDown();
+        if(clock_y.getElapsedTime().asMilliseconds() >= 1000 / speed_up) {
+            if(current_shape.canMoveDown())
+                current_shape.moveDown();
+            else {
+                current_shape.place(placed_shapes);
+                current_shape = TetrisShape::generateRandomShape(start_coordinate);
+            }
 
             clock_y.restart();
         }
@@ -237,9 +253,14 @@ int main()
 
         window.draw(game_area);
 
-        //current_shape.move(grid_x, grid_y);
         current_shape.update();
         current_shape.draw(window);
+
+        for(const auto& v: placed_shapes) {
+            for(const auto& r: v) {
+                window.draw(r);
+            }
+        }
 
         // DRAW GRID
         drawGrid(window);
