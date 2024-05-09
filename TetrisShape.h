@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <array>
+#include <time.h>
 
 class TetrisShape {
 public:
@@ -17,8 +19,12 @@ public:
     sf::Vector2f m_min_bounds;
     sf::Vector2f m_max_bounds;
 
+    bool m_can_rotate;
+
+    static const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> shapes;
+
 public:
-    TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets);
+    TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
 
     void draw(sf::RenderWindow& window);
 
@@ -35,7 +41,7 @@ public:
 
     void moveRight();
 
-    bool canMoveDown();
+    bool canMoveDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     void moveDown();
 

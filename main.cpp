@@ -236,7 +236,7 @@ int main()
         }
 
         if(clock_y.getElapsedTime().asMilliseconds() >= 1000 / speed_up) {
-            if(current_shape.canMoveDown())
+            if(current_shape.canMoveDown(placed_shapes))
                 current_shape.moveDown();
             else {
                 current_shape.place(placed_shapes);
