@@ -1,13 +1,19 @@
 #include <SFML/Graphics.hpp>
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
+
+#include "TetrisShape.h"
+
+#include <iostream>
 
 const int grid_rows = 20;
 const int grid_cols = 10;
 
 // https://i.imgur.com/kupYzAI.png
 
+//Currently gets redefined every game loop, despite being mostly static (score etc will change)
 void draw_left_side_area(sf::RenderWindow& window) {
     sf::RectangleShape left_side_area(sf::Vector2f(250, 800));
     left_side_area.setFillColor(sf::Color::Black);
@@ -118,6 +124,7 @@ void draw_left_side_area(sf::RenderWindow& window) {
 
 }
 
+//Currently gets redefined every game loop, despite being mostly static (next will change)
 void draw_right_side_area(sf::RenderWindow& window) {
     sf::RectangleShape right_side_area(sf::Vector2f(250, 800));
     right_side_area.setFillColor(sf::Color::Black);
@@ -155,6 +162,7 @@ void draw_right_side_area(sf::RenderWindow& window) {
 
 }
 
+//Currently gets redefined every game loop, despite being completely static
 void drawGrid(sf::RenderWindow& window) {
     for(int i = 1; i < grid_rows; i++) {
         sf::RectangleShape line(sf::Vector2f(400, 0.5f));
@@ -173,73 +181,6 @@ void drawGrid(sf::RenderWindow& window) {
     }
 }
 
-//Use rotation matrix to turn the shapes
-//Since our y-axis is flipped when compared to normal graphs (-y goes up and y goes down)
-//If we want to rotate clockwise we what normally would be a counter clockwise rotation
-//So if we want to rotate 90 deg clockwise, we have to calculate it like we want to rotate 90 deg counter clockwise
-
-class TetrisShape {
-public:
-    int grid_x;
-    int grid_y;
-    std::vector<sf::RectangleShape> cubes;
-    std::vector<sf::Vector2f> offsets;
-
-    int max_x_offset = 0;
-
-    TetrisShape(int x=0, int y=0, std::vector<sf::Vector2f> off={}) {
-        grid_x = x;
-        grid_y = y;
-
-        offsets = off;
-        cubes = std::vector<sf::RectangleShape>(offsets.size());
-
-        for(const sf::Vector2f& offset: offsets) {
-            max_x_offset = std::max(max_x_offset, static_cast<int>(offset.x));
-            sf::RectangleShape rect(sf::Vector2f(40, 40));
-            rect.setPosition(sf::Vector2f(250 + (grid_x+offset.x)*40, (grid_y+offset.y)*40));
-            rect.setFillColor(sf::Color::Green);
-
-            cubes.push_back(rect);
-        }
-    }
-
-    void draw(sf::RenderWindow& window) {
-        for(const sf::RectangleShape& rect: cubes) {
-            window.draw(rect);
-        }
-    }
-
-    //USE OFFSETS VECTOR HERE?
-    void move(int new_grid_x, int new_grid_y) {
-        int dx = grid_x - new_grid_x;
-        int dy = grid_y - new_grid_y;
-        for(sf::RectangleShape& rect: cubes) {
-            // rect.position.x += dx * 40;
-            // rect.position.y += dy * 40;
-            rect.setPosition(sf::Vector2f(rect.getPosition().x - dx * 40, rect.getPosition().y - dy * 40));
-            // rect.setPosition(sf::Vector2f(250 + (grid_x+offset.x)*40, (grid_y+offset.y)*40));
-        }
-
-        grid_x = new_grid_x;
-        grid_y = new_grid_y;
-    }
-
-    void rotateCube(sf::RectangleShape& cube) {
-        int x;
-    }
-
-    void rotate() {
-        for(sf::RectangleShape& rect: cubes) {
-            rotateCube(rect);
-        }
-    }
-
-    static TetrisShape generateRandomShape(int grid_x=0, int grid_y=1) {
-        return TetrisShape(grid_x, grid_y, {sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(2, 0), sf::Vector2f(3, 0)});
-    }
-};
-
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(900, 800), "Tetris");
@@ -250,13 +191,16 @@ int main()
     game_area.setOutlineThickness(5);
     game_area.setPosition(sf::Vector2f(250, 0));
 
-    int grid_x = 0;
-    int grid_y = 1;
 
-    TetrisShape current_shape = TetrisShape::generateRandomShape();
+    // The starting coordinate for every new TetrisShape
+    sf::Vector2f start_coordinate(4, 1);
+
+    TetrisShape current_shape = TetrisShape::generateRandomShape(start_coordinate);
 
     sf::Clock clock_y;
     sf::Clock clock_x;
+
+    sf::Clock clock_rotate;
 
     while(window.isOpen())
     {
@@ -268,24 +212,23 @@ int main()
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && clock_x.getElapsedTime().asMilliseconds() >= 75) {
-            grid_x -= 1;
-            if(grid_x < 0)
-                grid_x = 0;
+            current_shape.moveLeft();
             clock_x.restart();
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && clock_x.getElapsedTime().asMilliseconds() >= 75) {
-            grid_x += 1;
-            if((grid_x + current_shape.max_x_offset) >= grid_cols)
-                grid_x = grid_cols - 1 - current_shape.max_x_offset;
+            current_shape.moveRight();
             clock_x.restart();
         }
 
-        if(clock_y.getElapsedTime().asSeconds() >= 1 && grid_y < grid_rows - 1) {
-            grid_y++;
-            clock_y.restart();
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 100) {
+            current_shape.rotate();
+            clock_rotate.restart();
         }
 
-        // r.setPosition(sf::Vector2f(250 + grid_x*40, grid_y*40));
+        if(clock_y.getElapsedTime().asSeconds() >= 1) {
+            current_shape.moveDown();
 
+            clock_y.restart();
+        }
 
         window.clear();
 
@@ -294,13 +237,11 @@ int main()
 
         window.draw(game_area);
 
-        // DRAW GRID
-
-        current_shape.move(grid_x, grid_y);
+        //current_shape.move(grid_x, grid_y);
+        current_shape.update();
         current_shape.draw(window);
 
-        // window.draw(r);
-
+        // DRAW GRID
         drawGrid(window);
 
         window.display();
