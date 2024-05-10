@@ -18,7 +18,6 @@ TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, 
         m_cubes.push_back(rect);
     }
 
-    calculateBounds();
 }
 
 void TetrisShape::draw(sf::RenderWindow& window) {
@@ -33,22 +32,6 @@ void TetrisShape::update() {
 
         m_cubes[i].setPosition(sf::Vector2f(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40));
     }
-}
-
-void TetrisShape::calculateBounds() {
-    sf::Vector2f min_bounds(INT_MAX, INT_MAX);
-    sf::Vector2f max_bounds(INT_MIN, INT_MIN);
-
-    for(const sf::Vector2f& offset: m_offsets) {
-        min_bounds.x = std::min(min_bounds.x, offset.x);
-        min_bounds.y = std::min(min_bounds.y, offset.y);
-
-        max_bounds.x = std::max(max_bounds.x, offset.x);
-        max_bounds.y = std::max(max_bounds.y, offset.y);
-    }
-
-    m_min_bounds = min_bounds;
-    m_max_bounds = max_bounds;
 }
 
 bool TetrisShape::canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
@@ -160,7 +143,7 @@ sf::Vector2f TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& pl
 }
 
 TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
-    srand(time(NULL));
+
     int i = rand() % TetrisShape::shapes.size();
 
     bool can_rotate = true;

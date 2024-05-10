@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include <vector>
 #include <cmath>
@@ -7,6 +8,7 @@
 #include "TetrisShape.h"
 
 #include <iostream>
+#include <time.h>
 
 const int grid_rows = 20;
 const int grid_cols = 10;
@@ -125,7 +127,7 @@ void draw_left_side_area(sf::RenderWindow& window) {
 }
 
 //Currently gets redefined every game loop, despite being mostly static (next will change)
-void draw_right_side_area(sf::RenderWindow& window) {
+void draw_right_side_area(sf::RenderWindow& window, std::vector<TetrisShape>& next_shapes) {
     sf::RectangleShape right_side_area(sf::Vector2f(250, 800));
     right_side_area.setFillColor(sf::Color::Black);
     right_side_area.setPosition(sf::Vector2f(650, 0));
@@ -151,14 +153,24 @@ void draw_right_side_area(sf::RenderWindow& window) {
 
     window.draw(next_text);
 
-    // NEXT SMALL BOX
-    sf::RectangleShape next_small(sf::Vector2f(150, 285));
-    next_small.setPosition(sf::Vector2f(700, 90));
-    next_small.setFillColor(sf::Color::Black);
-    next_small.setOutlineColor(sf::Color::Cyan);
-    next_small.setOutlineThickness(2);
+    int o = 0;
 
-    window.draw(next_small);
+    for(TetrisShape& shape: next_shapes) {
+        for(int i = 0; i < shape.m_cubes.size(); i++) {
+            shape.m_cubes[i].setPosition(sf::Vector2f(750 + (shape.m_offsets[i].x)*40, o+120+(shape.m_offsets[i].y)*40));
+        }
+        shape.draw(window);
+        o+= 100;
+    }
+
+    // NEXT SMALL BOX
+    // sf::RectangleShape next_small(sf::Vector2f(150, 285));
+    // next_small.setPosition(sf::Vector2f(700, 90));
+    // next_small.setFillColor(sf::Color::Black);
+    // next_small.setOutlineColor(sf::Color::Cyan);
+    // next_small.setOutlineThickness(2);
+
+    // window.draw(next_small);
 
 }
 
@@ -239,13 +251,37 @@ int main()
     game_area.setOutlineThickness(3);
     game_area.setPosition(sf::Vector2f(250, 0));
 
+    sf::SoundBuffer move_buffer;
+    if(!move_buffer.loadFromFile("stop.wav")) {
+        std::cout << "Failed to load stop.wav" << "\n";
+        return -1;
+    }
+
+    srand(time(NULL));
+
+    sf::Sound move_sound;
+    move_sound.setBuffer(move_buffer);
+
+    sf::SoundBuffer line_clear_buffer;
+    if(!line_clear_buffer.loadFromFile("success-fanfare-trumpets-6185.mp3")) {
+        std::cout << "Failed to load success-fanfare-trumpets-6185.mp3" << "\n";
+        return -1;
+    }
+
+    sf::Sound line_clear_sound;
+    line_clear_sound.setBuffer(line_clear_buffer);
 
     // The starting coordinate for every new TetrisShape
     sf::Vector2f start_coordinate(4, 1);
 
     TetrisShape current_shape = TetrisShape::generateRandomShape(start_coordinate);
 
+    std::vector<TetrisShape> next_shapes;
+    for(int i = 0; i < 3; i++)
+        next_shapes.push_back(TetrisShape::generateRandomShape(start_coordinate));
+
     std::vector<std::vector<sf::RectangleShape>> placed_shapes(grid_rows, std::vector<sf::RectangleShape>(grid_cols));
+
 
     sf::Clock clock_y;
     sf::Clock clock_x;
@@ -266,14 +302,17 @@ int main()
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && clock_rotate.getElapsedTime().asMilliseconds() >= 200) {
             current_shape.rotate(placed_shapes);
             clock_rotate.restart();
+            move_sound.play();
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && clock_x.getElapsedTime().asMilliseconds() >= 75 && current_shape.canMoveLeft(placed_shapes)) {
             current_shape.moveLeft();
             clock_x.restart();
+            move_sound.play();
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && clock_x.getElapsedTime().asMilliseconds() >= 75 && current_shape.canMoveRight(placed_shapes)) {
             current_shape.moveRight();
             clock_x.restart();
+            move_sound.play();
         }
 
 
@@ -288,8 +327,16 @@ int main()
                 current_shape.moveDown();
             else {
                 sf::Vector2f highest_row = current_shape.place(placed_shapes);
-                current_shape = TetrisShape::generateRandomShape(start_coordinate);
-                clearRows(placed_shapes, highest_row);
+                current_shape = next_shapes.front();
+                next_shapes.erase(next_shapes.begin());
+                next_shapes.push_back(TetrisShape::generateRandomShape(start_coordinate));
+
+                //TODO Something gotta happen when its game over
+                if(!current_shape.canMove(placed_shapes, 0, 0))
+                    std::cout << "GAME OVER!!" << "\n";
+
+                if(clearRows(placed_shapes, highest_row))
+                    line_clear_sound.play();
             }
 
             clock_y.restart();
@@ -298,7 +345,7 @@ int main()
         window.clear();
 
         draw_left_side_area(window);
-        draw_right_side_area(window);
+        draw_right_side_area(window, next_shapes);
 
         window.draw(game_area);
 

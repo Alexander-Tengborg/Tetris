@@ -1,6 +1,6 @@
 g++ -c main.cpp -o main.o -I W:\SFML\include
 g++ -c TetrisShape.cpp -o TetrisShape.o -I W:\SFML\include
 
-::g++ .\main.o .\TetrisShape.o -o main.exe -L W:\SFML\lib -lsfml-system -lmingw32 -lsfml-graphics -lsfml-window -lsfml-main -mwindows -lopengl32 -lwinmm -lgdi32 -DSFML_STATIC
-g++ .\main.o .\TetrisShape.o -o main.exe -L W:\SFML\lib -lsfml-system -lmingw32 -lsfml-graphics -lsfml-window -lopengl32 -lwinmm -lgdi32 -DSFML_STATIC
+::g++ .\main.o .\TetrisShape.o -o main.exe -L W:\SFML\lib -lsfml-system -lmingw32 -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-main -mwindows -lopengl32 -lwinmm -lgdi32 -DSFML_STATIC
+g++ .\main.o .\TetrisShape.o -o main.exe -L W:\SFML\lib -lsfml-system -lmingw32 -lsfml-graphics -lsfml-window -lsfml-audio -lopengl32 -lwinmm -lgdi32 -DSFML_STATIC
 ::Second command removes -lsfml-main -mwindows which allows you to use the terminal
