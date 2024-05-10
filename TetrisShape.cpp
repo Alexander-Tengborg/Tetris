@@ -1,5 +1,9 @@
 #include "TetrisShape.h"
 
+TetrisShape::TetrisShape() {
+
+}
+
 //TODO Tetromino is the real name for a TetrisShape consisting of 4 blocks
 //TODO blocks instead of cubes/rects
 TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate) {
@@ -14,7 +18,6 @@ TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, 
         sf::RectangleShape rect(sf::Vector2f(40, 40));
         rect.setPosition(sf::Vector2f(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40));
         rect.setFillColor(color);
-
         m_cubes.push_back(rect);
     }
 
@@ -140,6 +143,13 @@ sf::Vector2f TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& pl
     }
 
     return row_span;
+}
+
+//Unused for now
+void TetrisShape::setTexture(sf::Texture& texture) {
+    for(auto& r: m_cubes) {
+        r.setTexture(&texture);
+    }
 }
 
 TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {

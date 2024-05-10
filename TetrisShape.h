@@ -24,6 +24,8 @@ public:
     static const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> shapes;
 
 public:
+    TetrisShape();
+
     TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
 
     void draw(sf::RenderWindow& window);
@@ -52,6 +54,8 @@ public:
     void rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     sf::Vector2f place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+
+    void setTexture(sf::Texture& texture);
 
     static TetrisShape generateRandomShape(sf::Vector2f grid_coord = {0, 1});
 };
