@@ -9,6 +9,7 @@
 #include <array>
 #include <time.h>
 #include <memory>
+#include <optional>
 
 class TetrisShape {
 public:
@@ -41,25 +42,25 @@ public:
 
     void update();
 
-    bool canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    bool canMoveLeft(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
     void moveLeft();
 
-    bool canMoveRight(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    bool canMoveRight(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
     void moveRight();
 
-    bool canMoveDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    bool canMoveDown(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
     void moveDown();
 
-    bool canMove(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets={});
+    bool canMove(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets={});
 
     std::vector<sf::Vector2f> calculateRotatedCubeOffsets();
 
-    void rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    void rotate(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
-    sf::Vector2i place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    sf::Vector2i place(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
     void setTexture(sf::Texture& texture);
 

@@ -53,7 +53,7 @@ void TetrisShape::update() {
     }
 }
 
-bool TetrisShape::canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+bool TetrisShape::canMoveLeft(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
     return canMove(placed_shapes, -1, 0);
 }
 
@@ -61,7 +61,7 @@ void TetrisShape::moveLeft() {
     m_grid_coord.x -= 1;
 }
 
-bool TetrisShape::canMoveRight(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+bool TetrisShape::canMoveRight(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
     return canMove(placed_shapes, 1, 0);
 }
 
@@ -69,7 +69,7 @@ void TetrisShape::moveRight() {
     m_grid_coord.x += 1;
 }
 
-bool TetrisShape::canMoveDown(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+bool TetrisShape::canMoveDown(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
     return canMove(placed_shapes, 0, 1);
 }
 
@@ -77,7 +77,7 @@ void TetrisShape::moveDown() {
     m_grid_coord.y += 1;
 }
 
-bool TetrisShape::canMove(std::vector<std::vector<sf::RectangleShape>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets) {
+bool TetrisShape::canMove(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes, int x_dir, int y_dir, std::vector<sf::Vector2f> offsets) {
     if(offsets.size() == 0)
         offsets = m_offsets;
     
@@ -89,10 +89,7 @@ bool TetrisShape::canMove(std::vector<std::vector<sf::RectangleShape>>& placed_s
         if(row < 0 || col < 0 || row >= placed_shapes.size() || col >= placed_shapes[0].size())
             return false;
 
-        //FIXME Find a better way to check if a placed_shape exists for the given row and col
-        //Since all of our placed shapes are 40x40...
-        sf::Vector2f cur_size = placed_shapes[row][col].getSize();
-        if(cur_size.x == 40 && cur_size.y == 40)
+        if(placed_shapes[row][col].has_value())
             return false;
     }
 
@@ -115,7 +112,7 @@ std::vector<sf::Vector2f> TetrisShape::calculateRotatedCubeOffsets() {
     return offsets;
 }
 
-void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+void TetrisShape::rotate(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
     if(!m_can_rotate)
         return;
 
@@ -142,7 +139,7 @@ void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_sh
 }
 
 //Returns the highest and lowest rows of the placed shaped so we then have to check as few rows as possible
-sf::Vector2i TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+sf::Vector2i TetrisShape::place(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
     sf::Vector2i row_span(INT_MAX, INT_MIN);
 
     for(int i = 0; i < m_cubes.size(); i++) {
@@ -155,7 +152,7 @@ sf::Vector2i TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& pl
         row_span.x = std::min(row_span.x, row);
         row_span.y = std::max(row_span.y, row);
 
-        placed_shapes[row][col] = m_cubes[i];
+        placed_shapes[row][col] = std::optional<sf::RectangleShape>(m_cubes[i]);
     }
 
     return row_span;

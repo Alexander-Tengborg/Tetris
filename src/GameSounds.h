@@ -15,7 +15,7 @@ class GameSounds {
 public:
     GameSounds() = default;
 
-    bool loadSounds();
+    void loadSounds();
 
     void playMoveSound();
 

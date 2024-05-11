@@ -1,16 +1,17 @@
 #pragma once
 
+#include "TetrisShape.h"
+
 #include <SFML/Graphics.hpp>
 
 #include <vector>
 #include <memory>
 
-#include "TetrisShape.h"
 
 class Ui {
+    std::shared_ptr<sf::RenderWindow> m_window;
 
     sf::Font m_font;
-    std::shared_ptr<sf::RenderWindow> m_window;
 
     std::vector<sf::RectangleShape> m_ui_rects;
     std::vector<sf::Text> m_ui_static_text;
@@ -23,18 +24,18 @@ class Ui {
     sf::Text m_line_text;
 
 public:
-    Ui(std::shared_ptr<sf::RenderWindow> window, sf::Vector2f grid_size);
+    Ui(std::shared_ptr<sf::RenderWindow> window, sf::Vector2i grid_size);
 
     void createStaticLeftSideArea();
     void createStaticRightSideArea();
-    void createStaticGrid(sf::Vector2f grid_size);
+    void createStaticGrid(sf::Vector2i grid_size);
     void createGameArea();
 
     void drawStaticSideAreas();
     void drawGrid();
     void drawGameArea();
 
-    void drawNextShapes(std::vector<TetrisShape>& next_shapes);
-    void drawHeldShape(TetrisShape& held_shape);
+    void drawShape(std::unique_ptr<TetrisShape>& shape, int offset_x = 0, int offset_y = 0);
+    void drawNextShapes(std::vector<std::unique_ptr<TetrisShape>>& next_shapes);
     void drawStats(int score, int level, int lines);
 };

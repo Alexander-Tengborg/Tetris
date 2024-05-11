@@ -17,9 +17,9 @@
 #include <memory>
 
 class Game {
-    const sf::Vector2f m_grid_size = {10, 20};
+    const sf::Vector2i m_grid_size = {10, 20};
 
-    const sf::Vector2f m_window_size = {900, 800};
+    const sf::Vector2i m_window_size = {900, 800};
     // const sf::Vector2f m_game_size = {400, m_window_size.y};
     // const sf::Vector2f m_side_area_size = {(m_window_size.x-m_game_size.x)/2, m_window_size.y};
 
@@ -27,12 +27,14 @@ class Game {
     sf::Vector2f m_start_coordinates = {4, 1};
 
     std::shared_ptr<sf::RenderWindow> m_window;
-    GameSounds m_sounds;
+    std::unique_ptr<Ui> m_ui;
+    GameSounds m_sounds; //pointer??
 
-    TetrisShape m_current_shape;
-    std::optional<TetrisShape> m_held_shape;
+    std::unique_ptr<TetrisShape> m_current_shape;
+    std::unique_ptr<TetrisShape> m_held_shape;
+    std::vector<std::unique_ptr<TetrisShape>> m_next_shapes;
 
-    std::vector<std::vector<sf::RectangleShape>> m_placed_shapes;
+    std::vector<std::vector<std::optional<sf::RectangleShape>>> m_placed_shapes;
 
     //Dont need 3 clocks, can just use 1 with modulo instead
     sf::Clock m_clock_y;
@@ -45,11 +47,7 @@ class Game {
 
     sf::Texture m_texture;
 
-    std::vector<TetrisShape> m_next_shapes;
-
     bool m_switched_block;
-
-    std::unique_ptr<Ui> m_ui;
 
 public:
     Game();
