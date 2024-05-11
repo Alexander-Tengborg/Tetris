@@ -126,8 +126,8 @@ void TetrisShape::rotate(std::vector<std::vector<sf::RectangleShape>>& placed_sh
 }
 
 //Returns the highest and lowest rows of the placed shaped so we then have to check as few rows as possible
-sf::Vector2f TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
-    sf::Vector2f row_span(INT_MAX, INT_MIN);
+sf::Vector2i TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes) {
+    sf::Vector2i row_span(INT_MAX, INT_MIN);
 
     for(int i = 0; i < m_cubes.size(); i++) {
         int row = m_grid_coord.y + m_offsets[i].y;
@@ -136,8 +136,8 @@ sf::Vector2f TetrisShape::place(std::vector<std::vector<sf::RectangleShape>>& pl
         std::cout << "row: " << row_span.x << " " << row << "\n";
 
         //FIXME row_span.x/y are floats, row is int. Convert them to the same type in a better way
-        row_span.x = std::min(row_span.x, (float)row);
-        row_span.y = std::max(row_span.y, (float)row);
+        row_span.x = std::min(row_span.x, row);
+        row_span.y = std::max(row_span.y, row);
 
         placed_shapes[row][col] = m_cubes[i];
     }

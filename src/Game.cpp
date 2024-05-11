@@ -4,22 +4,22 @@ Game::Game() {
     m_window.create(sf::VideoMode(m_game_size.x, m_game_size.y), "Tetris!");
 
     //UNUSED
-    // if(!m_texture.loadFromFile("red.png"))
+    // if(!m_texture.loadFromFile("../resources/textures/red.png"))
     //     std::cout << "FAILED TO LOAD RED.PNG D:" << "\n";    
 
-    //FIXME fix this    
+    m_switched_block = false;
+
+    //FIXME fix this so it can return properly  
     if(!m_sounds.loadSounds())
         return;
 
-    m_font.loadFromFile("Roboto-Regular.ttf");
-    m_current_shape = TetrisShape::generateRandomShape(m_start_coordinates);
+    m_font.loadFromFile("../resources/fonts/Roboto-Regular.ttf");
 
+    m_current_shape = TetrisShape::generateRandomShape(m_start_coordinates);
     for(int i = 0; i < 3; i++)
         m_next_shapes.push_back(TetrisShape::generateRandomShape(m_start_coordinates));
 
-    //TODO Not sure if this initialization works
     m_placed_shapes.resize(m_grid_size.y, std::vector<sf::RectangleShape>(m_grid_size.x));
-    // std::vector<std::vector<sf::RectangleShape>> placed_shapes(grid_rows, std::vector<sf::RectangleShape>(grid_cols));
 }
 
 //FIXME Currently gets redefined every game loop, despite being mostly static (score etc will change)
@@ -54,6 +54,14 @@ void Game::drawLeftSideArea() {
     hold_small.setOutlineThickness(2);
 
     m_window.draw(hold_small);
+
+    //HELD SHAPE
+    if(m_held_shape.has_value()) {
+        for(int i = 0; i < m_held_shape.value().m_cubes.size(); i++) {
+            m_held_shape.value().m_cubes[i].setPosition(sf::Vector2f(60 + (m_held_shape.value().m_offsets[i].x)*40, 120+(m_held_shape.value().m_offsets[i].y)*40));
+        }
+        m_held_shape.value().draw(m_window);
+    }
 
     // STATS 
     sf::RectangleShape stats(sf::Vector2f(200, 350));
@@ -220,7 +228,7 @@ void Game::moveRowsDown(std::vector<int> cleared_rows) {
     }
 }
 
-int Game::clearRows(sf::Vector2f row_span) {
+int Game::clearRows(sf::Vector2i row_span) {
     int amount_cleared_rows = 0;
     
     std::vector<int> cleared_rows;
@@ -293,6 +301,24 @@ void Game::runGame() {
                 m_window.close();
         }
 
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C) && !m_switched_block) {
+            m_switched_block = true;
+
+            //TODO before storing the current shape in held shape we want to reset its position and rotation
+
+            //If we are currently holding a shape;
+            if(m_held_shape.has_value()) {
+                TetrisShape temp_shape = m_current_shape;
+                m_current_shape = m_held_shape.value();
+                m_held_shape = temp_shape;
+            } else {
+                m_held_shape = m_current_shape;
+                m_current_shape = m_next_shapes.front();
+                m_next_shapes.erase(m_next_shapes.begin());
+                m_next_shapes.push_back(TetrisShape::generateRandomShape(m_start_coordinates));
+            }
+        }
+
         //FIXME Compare isKeyPressed to the KeyPressed event type
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && m_clock_rotate.getElapsedTime().asMilliseconds() >= 200) {
             m_current_shape.rotate(m_placed_shapes);
@@ -329,10 +355,12 @@ void Game::runGame() {
                 if(speed_up == 20)
                     m_score += 1;
             } else {
-                sf::Vector2f row_span = m_current_shape.place(m_placed_shapes);
+                sf::Vector2i row_span = m_current_shape.place(m_placed_shapes);
                 m_current_shape = m_next_shapes.front();
                 m_next_shapes.erase(m_next_shapes.begin());
                 m_next_shapes.push_back(TetrisShape::generateRandomShape(m_start_coordinates));
+        
+                m_switched_block = false;
 
                 //TODO Something gotta happen when its game over
                 if(!m_current_shape.canMove(m_placed_shapes, 0, 0))

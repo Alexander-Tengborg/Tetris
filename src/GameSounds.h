@@ -13,7 +13,7 @@ class GameSounds {
     sf::Music m_theme;
 
 public:
-    GameSounds();
+    GameSounds() = default;
 
     bool loadSounds();
 

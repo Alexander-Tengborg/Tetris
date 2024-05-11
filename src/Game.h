@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <time.h>
+#include <optional>
 
 class Game {
     const sf::Vector2f m_grid_size = {10, 20};
@@ -24,6 +25,7 @@ class Game {
     GameSounds m_sounds;
 
     TetrisShape m_current_shape;
+    std::optional<TetrisShape> m_held_shape;
 
     sf::Font m_font;
 
@@ -42,6 +44,8 @@ class Game {
 
     std::vector<TetrisShape> m_next_shapes;
 
+    bool m_switched_block;
+
 public:
     Game();
 
@@ -52,7 +56,7 @@ public:
 
     void moveRowsDown(std::vector<int> cleared_rows);
 
-    int clearRows(sf::Vector2f row_span);
+    int clearRows(sf::Vector2i row_span);
 
     void calculateFallSpeed();
 

@@ -53,7 +53,7 @@ public:
 
     void rotate(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
-    sf::Vector2f place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
+    sf::Vector2i place(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 
     void setTexture(sf::Texture& texture);
 
