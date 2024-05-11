@@ -8,11 +8,15 @@
 #include <cmath>
 #include <array>
 #include <time.h>
+#include <memory>
 
 class TetrisShape {
 public:
     std::vector<sf::RectangleShape> m_cubes;
     std::vector<sf::Vector2f> m_offsets;
+
+    //should be const
+    std::vector<sf::Vector2f> m_original_offsets;
 
     sf::Vector2f m_grid_coord;
 
@@ -21,6 +25,7 @@ public:
 
     bool m_can_rotate;
 
+    //m_
     static const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> shapes;
 
 public:
@@ -28,12 +33,13 @@ public:
 
     TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
 
-    void draw(sf::RenderWindow& window);
+    sf::Vector2i calculateXBounds();
 
-    //USE OFFSETS VECTOR HERE?
+    void reset(sf::Vector2f start);
+
+    void draw(std::shared_ptr<sf::RenderWindow> window);
+
     void update();
-
-    void calculateBounds();
 
     bool canMoveLeft(std::vector<std::vector<sf::RectangleShape>>& placed_shapes);
 

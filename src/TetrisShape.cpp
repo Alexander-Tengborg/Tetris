@@ -1,18 +1,18 @@
 #include "TetrisShape.h"
 
+//In the Game class TetrisShape is used as a member variable, and this constructor is called as the variable is defined.
+//In the Game class constructor it initializes TetrisShape with the other instructor, so this constructor is basically a placeholder
+//Need to fix this somehow, possibly by having the member variable in TetrisShape be a pointer or std::optional instead.
 TetrisShape::TetrisShape() {
 
 }
 
 //TODO Tetromino is the real name for a TetrisShape consisting of 4 blocks
 //TODO blocks instead of cubes/rects
-TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate) {
-    m_grid_coord = start;
+TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate)
+    : m_grid_coord(start), m_offsets(offsets), m_original_offsets(offsets), m_can_rotate(can_rotate) {
 
-    m_offsets = offsets;
     m_cubes = std::vector<sf::RectangleShape>();
-
-    m_can_rotate = can_rotate;
 
     for(const sf::Vector2f& offset: offsets) {
         sf::RectangleShape rect(sf::Vector2f(40, 40));
@@ -23,9 +23,25 @@ TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, 
 
 }
 
-void TetrisShape::draw(sf::RenderWindow& window) {
+sf::Vector2i TetrisShape::calculateXBounds() {
+    sf::Vector2i x_bounds(INT_MAX, INT_MIN);
+
+    for(const sf::Vector2f& offset: m_offsets) {
+        x_bounds.x = std::min(x_bounds.x, (int) offset.x);
+        x_bounds.y = std::max(x_bounds.y, (int) offset.x);
+    }
+
+    return x_bounds;
+}
+
+void TetrisShape::reset(sf::Vector2f start) {
+    m_grid_coord = start;
+    m_offsets = m_original_offsets;
+}
+
+void TetrisShape::draw(std::shared_ptr<sf::RenderWindow> window) {
     for(const sf::RectangleShape& rect: m_cubes) {
-        window.draw(rect);
+        window->draw(rect);
     }
 }
 
@@ -165,6 +181,7 @@ TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
     return TetrisShape(grid_coord, TetrisShape::shapes[i].first, TetrisShape::shapes[i].second, can_rotate);
 }
 
+//Add enum for all types? 
 //TODO this feels dirty
 const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> TetrisShape::shapes = {
     std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-2, 0), sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0)}), sf::Color::Cyan), // I

@@ -5,29 +5,32 @@
 #include <cmath>
 #include <algorithm>
 #include <string>
+#include <memory>
 
 #include "GameSounds.h"
 #include "TetrisShape.h"
+#include "Ui.h"
 
 #include <iostream>
 #include <time.h>
 #include <optional>
+#include <memory>
 
 class Game {
     const sf::Vector2f m_grid_size = {10, 20};
 
-    const sf::Vector2f m_game_size = {900, 800};
+    const sf::Vector2f m_window_size = {900, 800};
+    // const sf::Vector2f m_game_size = {400, m_window_size.y};
+    // const sf::Vector2f m_side_area_size = {(m_window_size.x-m_game_size.x)/2, m_window_size.y};
 
     // The starting coordinate for every new TetrisShape
     sf::Vector2f m_start_coordinates = {4, 1};
 
-    sf::RenderWindow m_window;
+    std::shared_ptr<sf::RenderWindow> m_window;
     GameSounds m_sounds;
 
     TetrisShape m_current_shape;
     std::optional<TetrisShape> m_held_shape;
-
-    sf::Font m_font;
 
     std::vector<std::vector<sf::RectangleShape>> m_placed_shapes;
 
@@ -46,13 +49,10 @@ class Game {
 
     bool m_switched_block;
 
+    std::unique_ptr<Ui> m_ui;
+
 public:
     Game();
-
-    void drawLeftSideArea();
-    void drawRightSideArea();
-    void drawGrid();
-    void drawGameArea();
 
     void moveRowsDown(std::vector<int> cleared_rows);
 
