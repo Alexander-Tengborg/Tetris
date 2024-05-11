@@ -3,9 +3,8 @@
 Game::Game() {
     m_window = std::make_shared<sf::RenderWindow>(sf::VideoMode(m_window_size.x, m_window_size.y), "Tetris!", sf::Style::Titlebar | sf::Style::Close);
 
-    //UNUSED
-    // if(!m_texture.loadFromFile("../resources/textures/red.png"))
-    //     std::cout << "FAILED TO LOAD RED.PNG D:" << "\n";    
+    if(!m_texture.loadFromFile("../resources/textures/Tetromino_texture.png"))
+        std::cout << "FAILED TO LOAD Tetromino_texture.PNG D:" << "\n";    
 
     m_switched_block = false;
 
@@ -13,9 +12,9 @@ Game::Game() {
 
     m_sounds.loadSounds();
 
-    m_current_shape = std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates));
+    m_current_shape = std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture));
     for(int i = 0; i < 3; i++)
-        m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates)));
+        m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
 
     m_placed_shapes.resize(m_grid_size.y, std::vector<std::optional<sf::RectangleShape>>(m_grid_size.x));
 }
@@ -103,6 +102,16 @@ void Game::calculateFallSpeed() {
 void Game::runGame() {
     m_sounds.playTheme();
 
+    sf::Shader shader_vert;
+    if(!shader_vert.loadFromFile("../test.vert", sf::Shader::Vertex))
+        std::cout << "Can't load shader vert D:";
+
+    sf::Shader shader_frag;
+    if(!shader_frag.loadFromFile("../test.frag", sf::Shader::Fragment))
+        std::cout << "Can't load shader frag D:";
+
+    //shader_frag.setUniform("texture", sf::Shader::CurrentTexture);
+
     while(m_window->isOpen())
     {
         sf::Event event;
@@ -125,7 +134,7 @@ void Game::runGame() {
                 m_current_shape.swap(m_held_shape);
                 m_current_shape.swap(m_next_shapes.front());
                 m_next_shapes.erase(m_next_shapes.begin());
-                m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates)));
+                m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
             }
         }
 
@@ -167,7 +176,7 @@ void Game::runGame() {
                 sf::Vector2i row_span = m_current_shape->place(m_placed_shapes);
                 m_current_shape.swap(m_next_shapes.front());
                 m_next_shapes.erase(m_next_shapes.begin());
-                m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates)));
+                m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
         
                 m_switched_block = false;
 
@@ -203,7 +212,7 @@ void Game::runGame() {
         for(const auto& v: m_placed_shapes) {
             for(const auto& r: v) {
                 if(r.has_value())
-                    m_window->draw(r.value());
+                    m_window->draw(r.value(), &shader_vert);
             }
         }
 

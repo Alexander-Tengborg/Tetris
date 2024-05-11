@@ -2,7 +2,7 @@
 
 //TODO Tetromino is the real name for a TetrisShape consisting of 4 blocks
 //TODO blocks instead of cubes/rects
-TetrisShape::TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate)
+TetrisShape::TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Texture& texture, sf::Rect<int> texture_rect, bool can_rotate)
     : m_grid_coord(start), m_offsets(offsets), m_original_offsets(offsets), m_can_rotate(can_rotate) {
 
     m_cubes = std::vector<sf::RectangleShape>();
@@ -10,7 +10,8 @@ TetrisShape::TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, 
     for(const sf::Vector2f& offset: offsets) {
         sf::RectangleShape rect(sf::Vector2f(40, 40));
         rect.setPosition(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40);
-        rect.setFillColor(color);
+        rect.setTexture(&texture);
+        rect.setTextureRect(texture_rect);
         m_cubes.push_back(rect);
     }
 
@@ -153,26 +154,28 @@ void TetrisShape::setTexture(sf::Texture& texture) {
     }
 }
 
-TetrisShape TetrisShape::generateRandomShape(sf::Vector2i grid_coord) {
+TetrisShape TetrisShape::generateRandomShape(sf::Vector2i grid_coord, sf::Texture& texture) {
     int i = rand() % TetrisShape::shapes.size();
 
     bool can_rotate = true;
+
+    sf::Rect<int> texture_rect(0, 40*i, 40, 40);
 
     //TODO dont want the square/O to be able to rotate. Is there a cleaner way to do this?
     if(i == 3)
         can_rotate = false;
 
-    return TetrisShape(grid_coord, TetrisShape::shapes[i].first, TetrisShape::shapes[i].second, can_rotate);
+    return TetrisShape(grid_coord, TetrisShape::shapes[i], texture, texture_rect, can_rotate);
 }
 
 //Add enum for all types? 
 //TODO this feels dirty
-const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> TetrisShape::shapes = {
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-2, 0), sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0)}), sf::Color::Cyan), // I
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(-1, -1)}), sf::Color::Blue), // L
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(1, -1)}), sf::Color(255, 165, 0)), // J
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(1, -1), sf::Vector2f(0, -1)}), sf::Color::Yellow), // O
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(0, -1), sf::Vector2f(1, -1)}), sf::Color::Green), // S
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(0, -1)}), sf::Color::Magenta), // T
-    std::make_pair(std::vector<sf::Vector2f>({sf::Vector2f(-1, -1), sf::Vector2f(0, 0), sf::Vector2f(0, -1), sf::Vector2f(1, 0)}), sf::Color::Red), // Z
+const std::array<std::vector<sf::Vector2f>, 7> TetrisShape::shapes = {
+    std::vector<sf::Vector2f>({sf::Vector2f(-2, 0), sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0)}), // I
+    std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(-1, -1)}), // L
+    std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(1, -1)}), // J
+    std::vector<sf::Vector2f>({sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(1, -1), sf::Vector2f(0, -1)}), // O
+    std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(0, -1), sf::Vector2f(1, -1)}), // S
+    std::vector<sf::Vector2f>({sf::Vector2f(-1, 0), sf::Vector2f(0, 0), sf::Vector2f(1, 0), sf::Vector2f(0, -1)}), // T
+    std::vector<sf::Vector2f>({sf::Vector2f(-1, -1), sf::Vector2f(0, 0), sf::Vector2f(0, -1), sf::Vector2f(1, 0)}) // Z
 };

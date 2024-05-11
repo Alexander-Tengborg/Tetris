@@ -30,6 +30,8 @@ class Game {
     std::unique_ptr<Ui> m_ui;
     GameSounds m_sounds; //pointer??
 
+    sf::Texture m_texture;
+
     std::unique_ptr<TetrisShape> m_current_shape;
     std::unique_ptr<TetrisShape> m_held_shape;
     std::vector<std::unique_ptr<TetrisShape>> m_next_shapes;
@@ -45,7 +47,6 @@ class Game {
     int m_level = 0;
     int m_lines = 0;
 
-    sf::Texture m_texture;
 
     bool m_switched_block;
 

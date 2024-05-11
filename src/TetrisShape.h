@@ -27,12 +27,12 @@ public:
 
     bool m_can_rotate;
 
-    static const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> shapes;
+    static const std::array<std::vector<sf::Vector2f>, 7> shapes;
 
 public:
     TetrisShape();
 
-    TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
+    TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Texture& texture, sf::Rect<int> texture_rect, bool can_rotate=true);
 
     sf::Vector2i calculateXBounds();
 
@@ -64,5 +64,5 @@ public:
 
     void setTexture(sf::Texture& texture);
 
-    static TetrisShape generateRandomShape(sf::Vector2i grid_coord = {0, 1});
+    static TetrisShape generateRandomShape(sf::Vector2i grid_coord, sf::Texture& texture);
 };
