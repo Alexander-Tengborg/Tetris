@@ -1,22 +1,15 @@
 #include "TetrisShape.h"
 
-//In the Game class TetrisShape is used as a member variable, and this constructor is called as the variable is defined.
-//In the Game class constructor it initializes TetrisShape with the other instructor, so this constructor is basically a placeholder
-//Need to fix this somehow, possibly by having the member variable in TetrisShape be a pointer or std::optional instead.
-TetrisShape::TetrisShape() {
-
-}
-
 //TODO Tetromino is the real name for a TetrisShape consisting of 4 blocks
 //TODO blocks instead of cubes/rects
-TetrisShape::TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate)
+TetrisShape::TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate)
     : m_grid_coord(start), m_offsets(offsets), m_original_offsets(offsets), m_can_rotate(can_rotate) {
 
     m_cubes = std::vector<sf::RectangleShape>();
 
     for(const sf::Vector2f& offset: offsets) {
         sf::RectangleShape rect(sf::Vector2f(40, 40));
-        rect.setPosition(sf::Vector2f(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40));
+        rect.setPosition(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40);
         rect.setFillColor(color);
         m_cubes.push_back(rect);
     }
@@ -34,7 +27,7 @@ sf::Vector2i TetrisShape::calculateXBounds() {
     return x_bounds;
 }
 
-void TetrisShape::reset(sf::Vector2f start) {
+void TetrisShape::reset(sf::Vector2i start) {
     m_grid_coord = start;
     m_offsets = m_original_offsets;
 }
@@ -49,7 +42,7 @@ void TetrisShape::update() {
     for(int i = 0; i < m_cubes.size(); i++) {
         sf::Vector2f offset = m_offsets[i];
 
-        m_cubes[i].setPosition(sf::Vector2f(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40));
+        m_cubes[i].setPosition(250 + (m_grid_coord.x+offset.x)*40, (m_grid_coord.y+offset.y)*40);
     }
 }
 
@@ -81,7 +74,7 @@ bool TetrisShape::canMove(std::vector<std::vector<std::optional<sf::RectangleSha
     if(offsets.size() == 0)
         offsets = m_offsets;
     
-    for(const auto& offset: offsets) {
+    for(const sf::Vector2f& offset: offsets) {
         int row = m_grid_coord.y + offset.y + y_dir;
         int col = m_grid_coord.x + offset.x + x_dir;
 
@@ -104,8 +97,8 @@ std::vector<sf::Vector2f> TetrisShape::calculateRotatedCubeOffsets() {
     std::vector<sf::Vector2f> offsets;
 
     for(sf::Vector2f& offset: m_offsets) {
-        double x = offset.x * std::cos(M_PI / 2) - offset.y * std::sin(M_PI / 2);
-        double y = offset.x * std::sin(M_PI / 2) + offset.y * std::cos(M_PI / 2);
+        float x = offset.x * std::cos(M_PI / 2) - offset.y * std::sin(M_PI / 2);
+        float y = offset.x * std::sin(M_PI / 2) + offset.y * std::cos(M_PI / 2);
         offsets.push_back(sf::Vector2f(x, y));
     }
 
@@ -134,8 +127,6 @@ void TetrisShape::rotate(std::vector<std::vector<std::optional<sf::RectangleShap
     }
 
     std::cout << "Could not rotate :(((" << "\n";
-
-    // calculateBounds();
 }
 
 //Returns the highest and lowest rows of the placed shaped so we then have to check as few rows as possible
@@ -146,9 +137,6 @@ sf::Vector2i TetrisShape::place(std::vector<std::vector<std::optional<sf::Rectan
         int row = m_grid_coord.y + m_offsets[i].y;
         int col = m_grid_coord.x + m_offsets[i].x;
 
-        std::cout << "row: " << row_span.x << " " << row << "\n";
-
-        //FIXME row_span.x/y are floats, row is int. Convert them to the same type in a better way
         row_span.x = std::min(row_span.x, row);
         row_span.y = std::max(row_span.y, row);
 
@@ -165,8 +153,7 @@ void TetrisShape::setTexture(sf::Texture& texture) {
     }
 }
 
-TetrisShape TetrisShape::generateRandomShape(sf::Vector2f grid_coord) {
-
+TetrisShape TetrisShape::generateRandomShape(sf::Vector2i grid_coord) {
     int i = rand() % TetrisShape::shapes.size();
 
     bool can_rotate = true;

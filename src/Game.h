@@ -1,16 +1,16 @@
 #pragma once
 
+#include "GameSounds.h"
+#include "TetrisShape.h"
+#include "Ui.h"
+
 #include <SFML/Graphics.hpp>
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
 #include <string>
 #include <memory>
-
-#include "GameSounds.h"
-#include "TetrisShape.h"
-#include "Ui.h"
-
 #include <iostream>
 #include <time.h>
 #include <optional>
@@ -24,7 +24,7 @@ class Game {
     // const sf::Vector2f m_side_area_size = {(m_window_size.x-m_game_size.x)/2, m_window_size.y};
 
     // The starting coordinate for every new TetrisShape
-    sf::Vector2f m_start_coordinates = {4, 1};
+    sf::Vector2i m_start_coordinates = {4, 1};
 
     std::shared_ptr<sf::RenderWindow> m_window;
     std::unique_ptr<Ui> m_ui;

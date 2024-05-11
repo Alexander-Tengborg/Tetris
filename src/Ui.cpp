@@ -40,7 +40,7 @@ void Ui::createStaticLeftSideArea() {
 
     // HOLD SMALL BOX
     // sf::RectangleShape hold_small(sf::Vector2f(150, 120));
-    // hold_small.setPosition(sf::Vector2f(50, 90));
+    // hold_small.setPosition(50, 90);
     // hold_small.setFillColor(sf::Color::Black);
     // hold_small.setOutlineColor(sf::Color::Cyan);
     // hold_small.setOutlineThickness(2);
@@ -135,7 +135,7 @@ void Ui::createStaticRightSideArea() {
 
     // NEXT SMALL BOX
     // sf::RectangleShape next_small(sf::Vector2f(150, 285));
-    // next_small.setPosition(sf::Vector2f(700, 90));
+    // next_small.setPosition(700, 90);
     // next_small.setFillColor(sf::Color::Black);
     // next_small.setOutlineColor(sf::Color::Cyan);
     // next_small.setOutlineThickness(2);

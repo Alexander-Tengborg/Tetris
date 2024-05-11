@@ -1,15 +1,19 @@
 #pragma once
 #define _USE_MATH_DEFINES
 
-#include <vector>
 #include <SFML/Graphics.hpp>
 
+#include <vector>
 #include <iostream>
 #include <cmath>
 #include <array>
 #include <time.h>
 #include <memory>
 #include <optional>
+
+//TODO
+//typedef this std::vector<std::vector<std::optional<sf::RectangleShape>>>
+//OR make it a shared pointer instead and store it is a member variable
 
 class TetrisShape {
 public:
@@ -19,24 +23,20 @@ public:
     //should be const
     std::vector<sf::Vector2f> m_original_offsets;
 
-    sf::Vector2f m_grid_coord;
-
-    sf::Vector2f m_min_bounds;
-    sf::Vector2f m_max_bounds;
+    sf::Vector2i m_grid_coord;
 
     bool m_can_rotate;
 
-    //m_
     static const std::array<std::pair<std::vector<sf::Vector2f>, sf::Color>, 7> shapes;
 
 public:
     TetrisShape();
 
-    TetrisShape(sf::Vector2f start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
+    TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Color color, bool can_rotate=true);
 
     sf::Vector2i calculateXBounds();
 
-    void reset(sf::Vector2f start);
+    void reset(sf::Vector2i start);
 
     void draw(std::shared_ptr<sf::RenderWindow> window);
 
@@ -64,5 +64,5 @@ public:
 
     void setTexture(sf::Texture& texture);
 
-    static TetrisShape generateRandomShape(sf::Vector2f grid_coord = {0, 1});
+    static TetrisShape generateRandomShape(sf::Vector2i grid_coord = {0, 1});
 };
