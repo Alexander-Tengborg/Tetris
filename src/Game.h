@@ -44,7 +44,7 @@ class Game {
     sf::Clock m_clock_rotate;
 
     int m_score = 0;
-    int m_level = 0;
+    int m_level = 1;
     int m_lines = 0;
 
 
@@ -58,6 +58,8 @@ public:
     int clearRows(sf::Vector2i row_span);
 
     void calculateFallSpeed();
+
+    void resetGame();
 
     void runGame();
 };

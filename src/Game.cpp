@@ -16,7 +16,9 @@ Game::Game() {
     for(int i = 0; i < 3; i++)
         m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
 
+
     m_placed_shapes.resize(m_grid_size.y, std::vector<std::optional<sf::RectangleShape>>(m_grid_size.x));
+    m_current_shape->calculateDropPosition(m_placed_shapes);
 }
 
 void Game::moveRowsDown(std::vector<int> cleared_rows) {
@@ -89,6 +91,25 @@ void Game::calculateFallSpeed() {
 
 }
 
+void Game::resetGame() {
+    std::cout << "Game over!" << "\n";
+    std::cout << "Resetting..." << "\n";
+
+    m_score = 0;
+    m_level = 1;
+    m_lines = 0;
+
+    m_held_shape.reset();
+    m_next_shapes.clear();
+
+    m_current_shape = std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture));
+    for(int i = 0; i < 3; i++)
+        m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
+
+    m_placed_shapes.clear();
+    m_placed_shapes.resize(m_grid_size.y, std::vector<std::optional<sf::RectangleShape>>(m_grid_size.x));
+}
+
 
 //SCORE:
 // https://tetris.wiki/Scoring
@@ -125,6 +146,24 @@ void Game::runGame() {
         {
             if(event.type == sf::Event::Closed)
                 m_window->close();
+
+            if(event.type == sf::Event::KeyPressed) {
+                if(event.key.scancode == sf::Keyboard::Scan::Space && m_current_shape->m_current_drop_position.size()) {
+                    sf::Vector2i row_span = m_current_shape->hardPlace(m_placed_shapes);
+                    m_current_shape.swap(m_next_shapes.front());
+                    m_next_shapes.erase(m_next_shapes.begin());
+                    m_next_shapes.push_back(std::make_unique<TetrisShape>(TetrisShape::generateRandomShape(m_start_coordinates, m_texture)));
+            
+                    m_switched_block = false;
+
+                    //TODO Something gotta happen when its game over
+                    if(!m_current_shape->canMove(m_placed_shapes, 0, 0))
+                        resetGame();
+
+                    if(clearRows(row_span))
+                        m_sounds.playLineClearSound();
+                }
+            }
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C) && !m_switched_block) {
@@ -170,7 +209,6 @@ void Game::runGame() {
             speed_up = 1;
         }
 
-
         if(m_clock_y.getElapsedTime().asMilliseconds() >= 1000 * std::pow(0.8-((m_level-1)*0.007), m_level-1) / speed_up) {
             // std::cout << 1000 * std::pow(0.8-((m_level-1)*0.007), m_level-1) / speed_up << "\n";
             if(m_current_shape->canMoveDown(m_placed_shapes)) {
@@ -188,7 +226,7 @@ void Game::runGame() {
 
                 //TODO Something gotta happen when its game over
                 if(!m_current_shape->canMove(m_placed_shapes, 0, 0))
-                    std::cout << "GAME OVER!!" << "\n";
+                    resetGame();
 
                 if(clearRows(row_span))
                     m_sounds.playLineClearSound();
@@ -210,6 +248,10 @@ void Game::runGame() {
 
         m_current_shape->update();
         m_current_shape->draw(m_window);
+
+
+        m_current_shape->calculateDropPosition(m_placed_shapes);
+        m_current_shape->drawDropPosition(m_window);
 
         //TODO Make a function for this?
         for(const auto& v: m_placed_shapes) {

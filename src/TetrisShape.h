@@ -20,18 +20,19 @@ public:
     std::vector<sf::RectangleShape> m_cubes;
     std::vector<sf::Vector2f> m_offsets;
 
+    std::vector<sf::RectangleShape> m_current_drop_position;
+
     //should be const
     std::vector<sf::Vector2f> m_original_offsets;
 
     sf::Vector2i m_grid_coord;
+    sf::Vector2i m_drop_location;
 
     bool m_can_rotate;
 
     static const std::array<std::vector<sf::Vector2f>, 7> shapes;
 
 public:
-    TetrisShape();
-
     TetrisShape(sf::Vector2i start, std::vector<sf::Vector2f> offsets, sf::Texture& texture, sf::Rect<int> texture_rect, bool can_rotate=true);
 
     sf::Vector2i calculateXBounds();
@@ -63,7 +64,13 @@ public:
 
     sf::Vector2i place(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
 
+    sf::Vector2i hardPlace(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
+
     void setTexture(sf::Texture& texture);
+
+    void calculateDropPosition(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes);
+
+    void drawDropPosition(std::shared_ptr<sf::RenderWindow> window);
 
     static TetrisShape generateRandomShape(sf::Vector2i grid_coord, sf::Texture& texture);
 };

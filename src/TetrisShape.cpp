@@ -153,10 +153,73 @@ sf::Vector2i TetrisShape::place(std::vector<std::vector<std::optional<sf::Rectan
     return row_span;
 }
 
+//Returns the highest and lowest rows of the placed shaped so we then have to check as few rows as possible
+sf::Vector2i TetrisShape::hardPlace(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
+    sf::Vector2i row_span(INT_MAX, INT_MIN);
+
+    for(int i = 0; i < m_cubes.size(); i++) {
+        int row = m_drop_location.y + m_offsets[i].y;
+        int col = m_drop_location.x + m_offsets[i].x;
+
+        row_span.x = std::min(row_span.x, row);
+        row_span.y = std::max(row_span.y, row);
+
+        m_cubes[i].setPosition(250 + col * 40, row * 40);
+
+        placed_shapes[row][col] = std::optional<sf::RectangleShape>(m_cubes[i]);
+    }
+
+    return row_span;
+}
+
 //Unused for now
 void TetrisShape::setTexture(sf::Texture& texture) {
     for(auto& r: m_cubes) {
         r.setTexture(&texture);
+    }
+}
+
+void TetrisShape::calculateDropPosition(std::vector<std::vector<std::optional<sf::RectangleShape>>>& placed_shapes) {
+    int y_offset = 0;
+    while(canMove(placed_shapes, 0, y_offset+1))
+        y_offset++;
+
+    if(y_offset == 0) {
+        m_drop_location = {0, 0};
+        m_current_drop_position = {};
+        return;
+    }
+    
+
+    m_drop_location = {m_grid_coord.x, m_grid_coord.y + y_offset};
+
+    std::vector<sf::RectangleShape> new_drop_positions;
+
+    for(sf::RectangleShape cube: m_cubes) {
+        sf::Vector2f new_pos = cube.getPosition();
+        new_pos.y += y_offset*40 + 2;
+        new_pos.x += 2;
+
+        cube.setPosition(new_pos);
+
+        cube.setTexture(0);
+
+        cube.setSize(sf::Vector2f(37, 37));
+
+        cube.setFillColor(sf::Color::Transparent);
+
+        cube.setOutlineColor(sf::Color::White);
+        cube.setOutlineThickness(1);
+
+        new_drop_positions.push_back(cube);
+    }
+
+    m_current_drop_position = new_drop_positions;
+}
+
+void TetrisShape::drawDropPosition(std::shared_ptr<sf::RenderWindow> window) {
+    for(sf::RectangleShape cube: m_current_drop_position) {
+        window->draw(cube);
     }
 }
 
