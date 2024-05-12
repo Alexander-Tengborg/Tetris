@@ -39,6 +39,12 @@ void TetrisShape::draw(std::shared_ptr<sf::RenderWindow> window) {
     }
 }
 
+void TetrisShape::draw(std::shared_ptr<sf::RenderWindow> window, sf::Shader& shader) {
+    for(const sf::RectangleShape& rect: m_cubes) {
+        window->draw(rect);
+    }
+}
+
 void TetrisShape::update() {
     for(int i = 0; i < m_cubes.size(); i++) {
         sf::Vector2f offset = m_offsets[i];

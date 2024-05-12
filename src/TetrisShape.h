@@ -39,6 +39,7 @@ public:
     void reset(sf::Vector2i start);
 
     void draw(std::shared_ptr<sf::RenderWindow> window);
+    void draw(std::shared_ptr<sf::RenderWindow> window, sf::Shader& shader);
 
     void update();
 

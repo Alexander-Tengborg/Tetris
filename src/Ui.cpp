@@ -19,7 +19,7 @@ void Ui::createStaticLeftSideArea() {
     left_side_area.setFillColor(sf::Color::Black);
     left_side_area.setPosition(0, 0);
     
-    m_ui_rects.push_back(left_side_area);
+    // m_ui_rects.push_back(left_side_area);
 
     // HOLD BIG BOX
     sf::RectangleShape hold(sf::Vector2f(200, 185));
@@ -28,7 +28,7 @@ void Ui::createStaticLeftSideArea() {
     hold.setOutlineThickness(2);
     hold.setPosition(25, 50);
 
-    m_ui_rects.push_back(hold);
+    // m_ui_rects.push_back(hold);
 
     // HOLD TEXT
     sf::Text hold_text("Hold", m_font);
@@ -54,7 +54,7 @@ void Ui::createStaticLeftSideArea() {
     stats.setOutlineThickness(2);
     stats.setPosition(25, 400);
 
-    m_ui_rects.push_back(stats);
+    // m_ui_rects.push_back(stats);
 
     // STATS - SCORE TEXT, 125 is the center pos of the stats rect
     sf::Text score_text("Score", m_font);
@@ -71,7 +71,7 @@ void Ui::createStaticLeftSideArea() {
     score.setOutlineColor(sf::Color::Cyan);
     score.setOutlineThickness(2);
 
-    m_ui_rects.push_back(score);
+    // m_ui_rects.push_back(score);
 
     // STATS - LEVEL TEXT
     sf::Text level_text("Level", m_font);
@@ -88,7 +88,7 @@ void Ui::createStaticLeftSideArea() {
     level.setOutlineColor(sf::Color::Cyan);
     level.setOutlineThickness(2);
 
-    m_ui_rects.push_back(level);
+    // m_ui_rects.push_back(level);
 
     // STATS - LINES TEXT
     sf::Text lines_text("Lines", m_font);
@@ -105,7 +105,7 @@ void Ui::createStaticLeftSideArea() {
     lines.setOutlineColor(sf::Color::Cyan);
     lines.setOutlineThickness(2);
 
-    m_ui_rects.push_back(lines);
+    // m_ui_rects.push_back(lines);
 }
 
 void Ui::createStaticRightSideArea() {
@@ -114,7 +114,7 @@ void Ui::createStaticRightSideArea() {
     right_side_area.setFillColor(sf::Color::Black);
     right_side_area.setPosition(650, 0);
     
-    m_ui_rects.push_back(right_side_area);
+    // m_ui_rects.push_back(right_side_area);
 
     // NEXT BIG BOX
     sf::RectangleShape next(sf::Vector2f(200, 360));
@@ -123,7 +123,7 @@ void Ui::createStaticRightSideArea() {
     next.setOutlineThickness(2);
     next.setPosition(675, 50);
 
-    m_ui_rects.push_back(next);
+    // m_ui_rects.push_back(next);
 
     // NEXT TEXT
     sf::Text next_text("Next", m_font);
@@ -164,11 +164,11 @@ void Ui::createStaticGrid(sf::Vector2i grid_size) {
 }
 
 void Ui::createGameArea() {
-    m_game_area = sf::RectangleShape(sf::Vector2f(400, 800));
+    m_game_area = sf::RectangleShape(sf::Vector2f(900, 800));
     m_game_area.setFillColor(sf::Color::Black);
     m_game_area.setOutlineColor(sf::Color::White);
     m_game_area.setOutlineThickness(3);
-    m_game_area.setPosition(250, 0);
+    m_game_area.setPosition(0, 0);
 }
 
 void Ui::drawStaticSideAreas() {
@@ -187,8 +187,9 @@ void Ui::drawGrid() {
     }
 }
 
-void Ui::drawGameArea() {
-    m_window->draw(m_game_area);
+void Ui::drawGameArea(sf::Texture& t, sf::Shader& s) {
+    m_game_area.setTexture(&t);
+    m_window->draw(m_game_area, &s);
 }
 
 void Ui::drawShape(std::unique_ptr<TetrisShape>& shape, int offset_x, int offset_y) {

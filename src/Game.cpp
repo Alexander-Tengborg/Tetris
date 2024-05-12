@@ -102,6 +102,8 @@ void Game::calculateFallSpeed() {
 void Game::runGame() {
     m_sounds.playTheme();
 
+    sf::Clock time;
+
     sf::Shader shader_vert;
     if(!shader_vert.loadFromFile("../test.vert", sf::Shader::Vertex))
         std::cout << "Can't load shader vert D:";
@@ -110,10 +112,14 @@ void Game::runGame() {
     if(!shader_frag.loadFromFile("../test.frag", sf::Shader::Fragment))
         std::cout << "Can't load shader frag D:";
 
+    sf::Texture t;
+    t.create(400, 800);
+
     //shader_frag.setUniform("texture", sf::Shader::CurrentTexture);
 
     while(m_window->isOpen())
     {
+        shader_frag.setUniform("time", time.getElapsedTime().asSeconds());
         sf::Event event;
         while(m_window->pollEvent(event))
         {
@@ -192,18 +198,15 @@ void Game::runGame() {
         }
 
         m_window->clear();
-
-
+        
+        m_ui->drawGameArea(t, shader_frag);
         m_ui->drawStaticSideAreas();
-
-        m_ui->drawNextShapes(m_next_shapes);
-        
-        if(m_held_shape)
-            m_ui->drawShape(m_held_shape);
-        
         m_ui->drawStats(m_score, m_level, m_lines);
 
-        m_ui->drawGameArea();
+        if(m_held_shape)
+            m_ui->drawShape(m_held_shape);
+
+        m_ui->drawNextShapes(m_next_shapes);
 
         m_current_shape->update();
         m_current_shape->draw(m_window);
@@ -212,7 +215,7 @@ void Game::runGame() {
         for(const auto& v: m_placed_shapes) {
             for(const auto& r: v) {
                 if(r.has_value())
-                    m_window->draw(r.value(), &shader_vert);
+                    m_window->draw(r.value());
             }
         }
 
