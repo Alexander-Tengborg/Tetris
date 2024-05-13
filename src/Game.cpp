@@ -2,6 +2,7 @@
 
 Game::Game() {
     m_window = std::make_shared<sf::RenderWindow>(sf::VideoMode(m_window_size.x, m_window_size.y), "Tetris!", sf::Style::Titlebar | sf::Style::Close);
+    m_window->setFramerateLimit(60);
 
     if(!m_texture.loadFromFile("../resources/textures/Tetromino_texture.png"))
         std::cout << "FAILED TO LOAD Tetromino_texture.PNG D:" << "\n";    
