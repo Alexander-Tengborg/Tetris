@@ -144,7 +144,7 @@ void Ui::createStaticRightSideArea() {
 }
 
 void Ui::createStaticGrid(sf::Vector2i grid_size) {
-    sf::Color grid_color(42, 42, 42);
+    sf::Color grid_color(70, 70, 70);
 
     for(int i = 1; i < grid_size.y; i++) {
         sf::RectangleShape line(sf::Vector2f(400, 1.0));
@@ -154,7 +154,7 @@ void Ui::createStaticGrid(sf::Vector2i grid_size) {
         m_grid.push_back(line);
     }
 
-    for(int i = 1; i < grid_size.x; i++) {
+    for(int i = 0; i <= grid_size.x; i++) {
         sf::RectangleShape line(sf::Vector2f(1, 800));
         line.setPosition(250 + i * 400 / grid_size.x, 0);
         line.setFillColor(grid_color);
