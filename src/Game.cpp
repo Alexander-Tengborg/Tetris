@@ -4,7 +4,7 @@ Game::Game() {
     m_window = std::make_shared<sf::RenderWindow>(sf::VideoMode(m_window_size.x, m_window_size.y), "Tetris!", sf::Style::Titlebar | sf::Style::Close);
     m_window->setFramerateLimit(60);
 
-    if(!m_texture.loadFromFile("../resources/textures/Tetromino_texture.png"))
+    if(!m_texture.loadFromFile("./resources/textures/Tetromino_texture.png"))
         std::cout << "FAILED TO LOAD Tetromino_texture.PNG D:" << "\n";    
 
     m_switched_block = false;
@@ -126,13 +126,9 @@ void Game::runGame() {
 
     sf::Clock time;
 
-    sf::Shader shader_vert;
-    if(!shader_vert.loadFromFile("../test.vert", sf::Shader::Vertex))
-        std::cout << "Can't load shader vert D:";
-
     sf::Shader shader_frag;
-    if(!shader_frag.loadFromFile("../test.frag", sf::Shader::Fragment))
-        std::cout << "Can't load shader frag D:";
+    if(!shader_frag.loadFromFile("./resources/shaders/background_shader.frag", sf::Shader::Fragment))
+        std::cout << "Can't load shader frag D:\n";
 
     sf::Texture t;
     t.create(400, 800);

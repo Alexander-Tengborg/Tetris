@@ -3,7 +3,7 @@
 Ui::Ui(std::shared_ptr<sf::RenderWindow> window, sf::Vector2i grid_size) {
     m_window = window;
 
-    if(!m_font.loadFromFile("../resources/fonts/Roboto-Regular.ttf")) {
+    if(!m_font.loadFromFile("./resources/fonts/Roboto-Regular.ttf")) {
         std::cout << "Failed to load file Roboto-Regular.ttf" << "\n";
         m_window->close();
     }
