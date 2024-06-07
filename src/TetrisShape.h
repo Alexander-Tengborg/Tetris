@@ -10,6 +10,7 @@
 #include <time.h>
 #include <memory>
 #include <optional>
+#include <climits>
 
 //TODO
 //typedef this std::vector<std::vector<std::optional<sf::RectangleShape>>>
