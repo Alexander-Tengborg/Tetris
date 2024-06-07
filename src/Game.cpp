@@ -122,22 +122,21 @@ void Game::resetGame() {
 //https://harddrop.com/wiki/Tetris_Worlds
 
 void Game::runGame() {
-    m_sounds.playTheme();
-
     sf::Clock time;
 
     sf::Shader shader_frag;
     if(!shader_frag.loadFromFile("./resources/shaders/background_shader.frag", sf::Shader::Fragment))
-        std::cout << "Can't load shader frag D:\n";
+        std::cout << "Could not load background_shader.frag\n";
 
-    sf::Texture t;
-    t.create(400, 800);
+    m_sounds.playTheme();
 
-    //shader_frag.setUniform("texture", sf::Shader::CurrentTexture);
+    bool use_shader = false;
+
+    sf::Texture game_area_texture;
+    game_area_texture.create(400, 800);
 
     while(m_window->isOpen())
     {
-        shader_frag.setUniform("time", time.getElapsedTime().asSeconds());
         sf::Event event;
         while(m_window->pollEvent(event))
         {
@@ -160,6 +159,9 @@ void Game::runGame() {
                     if(clearRows(row_span))
                         m_sounds.playLineClearSound();
                 }
+
+                if(event.key.scancode == sf::Keyboard::Scan::Scancode::V)
+                    use_shader = !use_shader;
             }
         }
 
@@ -233,8 +235,14 @@ void Game::runGame() {
         }
 
         m_window->clear();
-        
-        m_ui->drawGameArea(t, shader_frag);
+
+        if(use_shader) {
+            shader_frag.setUniform("time", time.getElapsedTime().asSeconds());
+            m_ui->drawGameArea(game_area_texture, shader_frag);
+        } else {
+            m_ui->drawGameArea(game_area_texture);
+        }
+
         m_ui->drawStaticSideAreas();
         m_ui->drawStats(m_score, m_level, m_lines);
 

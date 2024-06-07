@@ -187,6 +187,11 @@ void Ui::drawGrid() {
     }
 }
 
+void Ui::drawGameArea(sf::Texture& t) {
+    m_game_area.setTexture(&t);
+    m_window->draw(m_game_area);
+}
+
 void Ui::drawGameArea(sf::Texture& t, sf::Shader& s) {
     m_game_area.setTexture(&t);
     m_window->draw(m_game_area, &s);

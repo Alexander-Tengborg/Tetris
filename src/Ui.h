@@ -33,6 +33,7 @@ public:
 
     void drawStaticSideAreas();
     void drawGrid();
+    void drawGameArea(sf::Texture& t);
     void drawGameArea(sf::Texture& t, sf::Shader& s);
 
     void drawShape(std::unique_ptr<TetrisShape>& shape, int offset_x = 0, int offset_y = 0);
