@@ -1,7 +1,10 @@
 # Tetris
 Tetris written in C++ using the SFML library. Uses the latest development version of SFML, SFML 3.
 
-<img src="https://github.com/Alexander-Tengborg/Tetris/assets/14126933/a52d1393-01a0-4904-987b-8421bc86b267" width="50%" height="50%">
+<p align="center">
+    <img src="https://github.com/Alexander-Tengborg/Tetris/assets/14126933/a52d1393-01a0-4904-987b-8421bc86b267" width="75%" height="75%">
+</p>
+
 ## Controls
 **Left arrow key**: Move Left
 
