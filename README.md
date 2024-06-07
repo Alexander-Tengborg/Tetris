@@ -1,11 +1,7 @@
-
 # Tetris
 Tetris written in C++ using the SFML library. Uses the latest development version of SFML, SFML 3.
 
-By pressing the V key you can enable a very distracting moving background :D
-![image](https://github.com/Alexander-Tengborg/Tetris/assets/14126933/a52d1393-01a0-4904-987b-8421bc86b267){: width="50%"}
-
-
+<img src="https://github.com/Alexander-Tengborg/Tetris/assets/14126933/a52d1393-01a0-4904-987b-8421bc86b267" width="50%" height="50%">
 ## Controls
 **Left arrow key**: Move Left
 
