@@ -199,7 +199,6 @@ void Game::runGame() {
             m_sounds.playMoveSound();
         }
 
-
         //TODO Implement the calculateFallSpeed() function
         int speed_up = 1;
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
