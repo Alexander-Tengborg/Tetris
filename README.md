@@ -1,21 +1,29 @@
 
 # Tetris
 Tetris written in C++ using the SFML library. Uses the latest development version of SFML, SFML 3.
+
 By pressing the V key you can enable a very distracting moving background :D
 ![image](https://github.com/Alexander-Tengborg/Tetris/assets/14126933/a52d1393-01a0-4904-987b-8421bc86b267)
 
 
 ## Controls
 **Left arrow key**: Move Left
+
 **Right arrow key**: Move Right
+
 **Up arrow key**: Rotate Clockwise
+
 **Down arrow key**: Soft Drop
+
 **Space**: Hard Drop
+
 **C**: Hold Piece
+
 **V**: Enable/Disable the shader for the game background
 
 ## Downloading the game
 Install Git and CMake, then clone this repo.
+
 On Linux, the following dependencies may need to be downloaded:
 ```
 sudo apt update
